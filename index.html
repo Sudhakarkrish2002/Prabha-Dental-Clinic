@@ -178,6 +178,33 @@
     .form-input:focus + .form-label, .form-input:not(:placeholder-shown) + .form-label { top: 4px; font-size: 0.7rem; color: var(--teal-light); }
     .form-input:focus { outline: none; border-color: var(--teal); background: rgba(255,255,255,0.08); box-shadow: 0 0 20px rgba(13,148,136,0.15); }
 
+    /* CUSTOM DROPDOWN */
+    .custom-select-wrapper { position: relative; }
+    .custom-select-trigger { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 14px 46px 14px 18px; color: rgba(255,255,255,0.4); font-size: 0.95rem; font-family: 'Inter', sans-serif; width: 100%; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease; user-select: none; }
+    .custom-select-trigger.has-value { color: rgba(255,255,255,0.9); }
+    .custom-select-trigger:hover, .custom-select-trigger.open { border-color: var(--teal); background: rgba(255,255,255,0.08); box-shadow: 0 0 20px rgba(13,148,136,0.15); }
+    .custom-select-trigger .cs-label { font-size: 0.7rem; color: var(--teal-light); position: absolute; top: 5px; left: 18px; display: none; }
+    .custom-select-trigger.has-value .cs-label { display: block; }
+    .custom-select-trigger.has-value .cs-placeholder { margin-top: 8px; }
+    .custom-select-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); pointer-events: none; transition: transform 0.3s ease; color: rgba(255,255,255,0.5); }
+    .custom-select-trigger.open ~ .custom-select-arrow { transform: translateY(-50%) rotate(180deg); color: var(--teal-light); }
+    .custom-select-dropdown { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: #0d2420; border: 1px solid rgba(13,148,136,0.4); border-radius: 14px; z-index: 9999; overflow-y: auto; max-height: 320px; opacity: 0; transform: translateY(-8px) scaleY(0.96); transform-origin: top; pointer-events: none; transition: opacity 0.25s ease, transform 0.25s ease; box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(13,148,136,0.15); scrollbar-width: thin; scrollbar-color: rgba(13,148,136,0.4) transparent; }
+    .custom-select-dropdown::-webkit-scrollbar { width: 4px; }
+    .custom-select-dropdown::-webkit-scrollbar-track { background: transparent; }
+    .custom-select-dropdown::-webkit-scrollbar-thumb { background: rgba(13,148,136,0.4); border-radius: 4px; }
+    .custom-select-dropdown.open { opacity: 1; transform: translateY(0) scaleY(1); pointer-events: auto; }
+    .cs-option { display: flex; align-items: center; gap: 12px; padding: 13px 18px; cursor: pointer; transition: background 0.18s ease; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .cs-option:last-child { border-bottom: none; }
+    .cs-option:hover { background: rgba(13,148,136,0.15); }
+    .cs-option.selected { background: rgba(13,148,136,0.22); }
+    .cs-option-icon { width: 34px; height: 34px; border-radius: 9px; background: rgba(13,148,136,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cs-option.selected .cs-option-icon { background: rgba(13,148,136,0.3); }
+    .cs-option-icon svg { stroke: #5eead4; }
+    .cs-option-text { color: rgba(255,255,255,0.85); font-size: 0.9rem; font-family: 'Inter', sans-serif; }
+    .cs-option.selected .cs-option-text { color: #5eead4; font-weight: 500; }
+    .cs-option-check { margin-left: auto; flex-shrink: 0; opacity: 0; transition: opacity 0.2s; stroke: #5eead4; }
+    .cs-option.selected .cs-option-check { opacity: 1; }
+
     /* ANIMATIONS */
     @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
     @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(13,148,136,0.3); } 50% { box-shadow: 0 0 40px rgba(13,148,136,0.5); } }
@@ -851,7 +878,7 @@
       </div>
 
       <!-- Unified Contact Card Container -->
-      <div class="reveal bg-white/[0.03] border border-white/10 rounded-3xl backdrop-blur-xl overflow-hidden shadow-2xl">
+      <div class="reveal bg-white/[0.03] border border-white/10 rounded-3xl backdrop-blur-xl shadow-2xl" style="overflow: visible;">
         <div class="grid xl:grid-cols-5">
           
           <!-- Contact Info Panel (Left Side, 2 Columns on Desktop) -->
@@ -911,18 +938,71 @@
                 <input type="email" id="email" name="email" placeholder="Your email" class="form-input" />
                 <label for="email" class="form-label">Email Address</label>
               </div>
-              <div class="form-group relative">
-                <select id="service-select" name="service" class="form-input cursor-pointer appearance-none text-white/90">
-                  <option value="" class="bg-dark" disabled selected hidden>Select Service</option>
-                  <option value="general" class="bg-dark text-white">General Dentistry</option>
-                  <option value="implants" class="bg-dark text-white">Dental Implants</option>
-                  <option value="rootcanal" class="bg-dark text-white">Root Canal</option>
-                  <option value="whitening" class="bg-dark text-white">Teeth Whitening</option>
-                  <option value="braces" class="bg-dark text-white">Braces & Orthodontics</option>
-                  <option value="pediatric" class="bg-dark text-white">Pediatric Dentistry</option>
-                </select>
-                <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                  <svg class="w-4 h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              <!-- Custom Dropdown -->
+              <div class="custom-select-wrapper" id="cs-wrapper">
+                <input type="hidden" id="service-select" name="service" />
+                <div class="custom-select-trigger" id="cs-trigger" role="button" aria-haspopup="listbox" aria-expanded="false" tabindex="0">
+                  <span class="cs-label">Select Service</span>
+                  <span class="cs-placeholder" id="cs-display">Select Service</span>
+                </div>
+                <svg class="custom-select-arrow w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                <div class="custom-select-dropdown" id="cs-dropdown" role="listbox">
+                  <div class="cs-option" data-value="general" role="option" tabindex="-1">
+                    <div class="cs-option-icon">
+                      <svg class="w-4 h-4" fill="none" stroke="#5eead4" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <span class="cs-option-text">General Dentistry</span>
+                    <svg class="cs-option-check w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <div class="cs-option" data-value="implants" role="option" tabindex="-1">
+                    <div class="cs-option-icon">
+                      <svg class="w-4 h-4" fill="none" stroke="#5eead4" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    </div>
+                    <span class="cs-option-text">Dental Implants</span>
+                    <svg class="cs-option-check w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <div class="cs-option" data-value="rootcanal" role="option" tabindex="-1">
+                    <div class="cs-option-icon">
+                      <svg class="w-4 h-4" fill="none" stroke="#5eead4" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    </div>
+                    <span class="cs-option-text">Root Canal</span>
+                    <svg class="cs-option-check w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <div class="cs-option" data-value="whitening" role="option" tabindex="-1">
+                    <div class="cs-option-icon">
+                      <svg class="w-4 h-4" fill="none" stroke="#5eead4" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                    </div>
+                    <span class="cs-option-text">Teeth Whitening</span>
+                    <svg class="cs-option-check w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <div class="cs-option" data-value="braces" role="option" tabindex="-1">
+                    <div class="cs-option-icon">
+                      <svg class="w-4 h-4" fill="none" stroke="#5eead4" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    </div>
+                    <span class="cs-option-text">Braces &amp; Orthodontics</span>
+                    <svg class="cs-option-check w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <div class="cs-option" data-value="crowns" role="option" tabindex="-1">
+                    <div class="cs-option-icon">
+                      <svg class="w-4 h-4" fill="none" stroke="#5eead4" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                    </div>
+                    <span class="cs-option-text">Crowns &amp; Bridges</span>
+                    <svg class="cs-option-check w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <div class="cs-option" data-value="pediatric" role="option" tabindex="-1">
+                    <div class="cs-option-icon">
+                      <svg class="w-4 h-4" fill="none" stroke="#5eead4" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <span class="cs-option-text">Pediatric Dentistry</span>
+                    <svg class="cs-option-check w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <div class="cs-option" data-value="cosmetic" role="option" tabindex="-1">
+                    <div class="cs-option-icon">
+                      <svg class="w-4 h-4" fill="none" stroke="#5eead4" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                    </div>
+                    <span class="cs-option-text">Cosmetic Dentistry</span>
+                    <svg class="cs-option-check w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  </div>
                 </div>
               </div>
               <div class="form-group">

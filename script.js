@@ -409,4 +409,95 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+
+  // ========== CUSTOM SERVICE DROPDOWN ==========
+  const csTrigger   = document.getElementById('cs-trigger');
+  const csDropdown  = document.getElementById('cs-dropdown');
+  const csDisplay   = document.getElementById('cs-display');
+  const csInput     = document.getElementById('service-select');
+  const csOptions   = csDropdown ? csDropdown.querySelectorAll('.cs-option') : [];
+
+  function openCS() {
+    csTrigger.classList.add('open');
+    csDropdown.classList.add('open');
+    csTrigger.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeCS() {
+    csTrigger.classList.remove('open');
+    csDropdown.classList.remove('open');
+    csTrigger.setAttribute('aria-expanded', 'false');
+  }
+
+  function selectCSOption(option) {
+    const value = option.getAttribute('data-value');
+    const label = option.querySelector('.cs-option-text').textContent;
+
+    // Update hidden input
+    csInput.value = value;
+
+    // Update trigger display
+    csDisplay.textContent = label;
+    csTrigger.classList.add('has-value');
+
+    // Mark selected
+    csOptions.forEach(o => o.classList.remove('selected'));
+    option.classList.add('selected');
+
+    closeCS();
+  }
+
+  if (csTrigger && csDropdown) {
+    // Toggle on click
+    csTrigger.addEventListener('click', () => {
+      csTrigger.classList.contains('open') ? closeCS() : openCS();
+    });
+
+    // Option click
+    csOptions.forEach(option => {
+      option.addEventListener('click', () => selectCSOption(option));
+    });
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (!csTrigger.closest('#cs-wrapper').contains(e.target)) {
+        closeCS();
+      }
+    });
+
+    // Keyboard: Enter/Space to open, Escape to close, ArrowDown/Up to navigate
+    csTrigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        csTrigger.classList.contains('open') ? closeCS() : openCS();
+      } else if (e.key === 'Escape') {
+        closeCS();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!csTrigger.classList.contains('open')) openCS();
+        csOptions[0] && csOptions[0].focus();
+      }
+    });
+
+    csOptions.forEach((option, idx) => {
+      option.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectCSOption(option); }
+        else if (e.key === 'Escape') { closeCS(); csTrigger.focus(); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); csOptions[idx + 1] && csOptions[idx + 1].focus(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); idx > 0 ? csOptions[idx - 1].focus() : csTrigger.focus(); }
+      });
+    });
+  }
+
+  // Also reset custom dropdown when form is reset
+  const contactFormEl = document.getElementById('contact-form');
+  if (contactFormEl) {
+    contactFormEl.addEventListener('reset', () => {
+      if (csDisplay) csDisplay.textContent = 'Select Service';
+      if (csTrigger) csTrigger.classList.remove('has-value');
+      if (csInput)   csInput.value = '';
+      csOptions.forEach(o => o.classList.remove('selected'));
+    });
+  }
+
 });
