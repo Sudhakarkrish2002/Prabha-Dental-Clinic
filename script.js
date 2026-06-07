@@ -4,6 +4,56 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  // ========== MOBILE MENU (init first so later errors cannot break it) ==========
+  const menuToggle = document.getElementById('menu-toggle');
+  const menuClose = document.getElementById('menu-close');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  if (menuToggle && menuClose && mobileMenu) {
+    const menuBackdrop = document.getElementById('mobile-menu-backdrop');
+    const mobileNavLinks = document.querySelectorAll('.mobile-menu-link, .mobile-menu-cta');
+
+    function openMenu() {
+      mobileMenu.classList.add('active');
+      mobileMenu.setAttribute('aria-hidden', 'false');
+      menuToggle.setAttribute('aria-expanded', 'true');
+      menuToggle.setAttribute('aria-label', 'Close menu');
+      document.body.classList.add('menu-open');
+    }
+
+    function closeMenu() {
+      mobileMenu.classList.remove('active');
+      mobileMenu.setAttribute('aria-hidden', 'true');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      menuToggle.setAttribute('aria-label', 'Open menu');
+      document.body.classList.remove('menu-open');
+    }
+
+    menuToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (mobileMenu.classList.contains('active')) closeMenu();
+      else openMenu();
+    });
+
+    menuClose.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeMenu();
+    });
+
+    if (menuBackdrop) {
+      menuBackdrop.addEventListener('click', closeMenu);
+    }
+
+    mobileNavLinks.forEach(link => {
+      link.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileMenu.classList.contains('active')) closeMenu();
+    });
+  }
+
   // ========== PRELOADER ==========
   const preloader = document.getElementById('preloader');
   // Add a slight delay to ensure smooth transition even if load is instant
@@ -33,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const sections = document.querySelectorAll('section[id]');
 
   function handleNavbarScroll() {
+    if (!navbar) return;
     if (window.scrollY > 50) {
       navbar.classList.add('fixed', 'top-0', 'scrolled');
     } else {
@@ -75,34 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (scrollY < window.innerHeight && heroBg) {
       heroBg.style.transform = `translate3d(0, ${scrollY * 0.4}px, 0)`;
     }
-  });
-
-
-  // ========== MOBILE MENU ==========
-  const menuToggle = document.getElementById('menu-toggle');
-  const menuClose = document.getElementById('menu-close');
-  const mobileMenu = document.getElementById('mobile-menu');
-  const menuOverlay = document.getElementById('menu-overlay');
-  const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-
-  function openMenu() {
-    mobileMenu.classList.add('active');
-    menuOverlay.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeMenu() {
-    mobileMenu.classList.remove('active');
-    menuOverlay.classList.add('hidden');
-    document.body.style.overflow = '';
-  }
-
-  menuToggle.addEventListener('click', openMenu);
-  menuClose.addEventListener('click', closeMenu);
-  menuOverlay.addEventListener('click', closeMenu);
-
-  mobileNavLinks.forEach(link => {
-    link.addEventListener('click', closeMenu);
   });
 
 
@@ -244,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.addEventListener('keydown', (e) => {
-    if (!lightbox.classList.contains('active')) return;
+    if (!lightbox || !lightbox.classList.contains('active')) return;
     if (e.key === 'Escape') closeLightbox();
     if (e.key === 'ArrowLeft') prevImage();
     if (e.key === 'ArrowRight') nextImage();
@@ -261,6 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSlide = 0;
     let autoPlayInterval;
 
+    if (dotsContainer) {
     // Create dots
     slides.forEach((_, i) => {
       const dot = document.createElement('button');
@@ -336,16 +360,56 @@ document.addEventListener('DOMContentLoaded', () => {
         resetAutoPlay();
       }
     }, { passive: true });
+    }
   }
 
 
-  // ========== CONTACT FORM ==========
+  // ========== CONTACT FORM — EmailJS + WhatsApp + LocalStorage ==========
   const contactForm = document.getElementById('contact-form');
   const formSuccess = document.getElementById('form-success');
 
+  // ── EmailJS Config ──
+  const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
+  const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
+  const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+
+  // ── WhatsApp number ──
+  const CLINIC_WHATSAPP = '916381333937'; // Clinic number ✅
+
+  if (typeof emailjs !== 'undefined') emailjs.init(EMAILJS_PUBLIC_KEY);
+
+  // ── Save submission to localStorage ──
+  function saveSubmission(data) {
+    const submissions = JSON.parse(localStorage.getItem('pdc_submissions') || '[]');
+    submissions.unshift({
+      id      : Date.now(),
+      name    : data.name,
+      phone   : data.phone,
+      email   : data.email,
+      service : data.service,
+      message : data.message,
+      date    : new Date().toISOString(),
+      read    : false,
+    });
+    localStorage.setItem('pdc_submissions', JSON.stringify(submissions));
+  }
+
   if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
+      // Collect form values
+      const name        = document.getElementById('name').value.trim();
+      const phone       = document.getElementById('phone').value.trim();
+      const email       = document.getElementById('email').value.trim();
+      const serviceEl   = document.getElementById('service-input');
+      const serviceName = serviceEl.value || 'Not specified';
+      const message     = document.getElementById('message').value.trim();
+
+      // ── Save to localStorage for admin dashboard ──
+      saveSubmission({ name, phone, email, service: serviceName, message });
+
+      // Show loading state
       const submitBtn = contactForm.querySelector('button[type="submit"]');
       const originalContent = submitBtn.innerHTML;
       submitBtn.innerHTML = `
@@ -357,18 +421,54 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       submitBtn.disabled = true;
 
-      setTimeout(() => {
-        contactForm.style.display = 'none';
-        formSuccess.classList.remove('hidden');
-        submitBtn.innerHTML = originalContent;
-        submitBtn.disabled = false;
+      // ── 1. Send Email via EmailJS (auto — no customer action needed) ──
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          from_name : name,
+          phone     : phone,
+          email     : email || 'Not provided',
+          service   : serviceName,
+          message   : message || 'No message',
+          reply_to  : email || 'dentalclinic.prabha@gmail.com',
+        });
+      } catch (err) {
+        console.warn('EmailJS error:', err);
+        // Even if email fails, still redirect to WhatsApp
+      }
 
-        setTimeout(() => {
-          contactForm.style.display = 'block';
-          formSuccess.classList.add('hidden');
-          contactForm.reset();
-        }, 5000);
-      }, 1500);
+      // ── 2. Also open WhatsApp with pre-filled message ──
+      const lines = [
+        '*----------------------------------*',
+        '*  New Appointment Request  *',
+        '*  Prabha Dental Clinic  *',
+        '*----------------------------------*',
+        '',
+        '*Name    :* ' + name,
+        '*Phone   :* ' + phone,
+        email   ? '*Email   :* ' + email   : '',
+        '*Service :* ' + serviceName,
+        message ? '*Message :* ' + message : '',
+        '',
+        '*----------------------------------*',
+        '_Sent via Prabha Dental Clinic website_',
+      ].filter(line => line !== '').join('\n');
+
+      const encodedMsg  = encodeURIComponent(lines);
+      const whatsappURL = `https://wa.me/${CLINIC_WHATSAPP}?text=${encodedMsg}`;
+      window.open(whatsappURL, '_blank');
+
+      // ── 3. Show success state ──
+      contactForm.style.display = 'none';
+      formSuccess.classList.remove('hidden');
+      submitBtn.innerHTML = originalContent;
+      submitBtn.disabled  = false;
+
+      // Reset after 5 seconds
+      setTimeout(() => {
+        contactForm.style.display = 'block';
+        formSuccess.classList.add('hidden');
+        contactForm.reset();
+      }, 5000);
     });
   }
 
@@ -387,6 +487,41 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  // ========== CUSTOM DROPDOWN ==========
+  const serviceTrigger = document.getElementById('dd-service-trigger');
+  const serviceMenu    = document.getElementById('dd-service-menu');
+  const serviceLabel   = document.getElementById('dd-service-label');
+  const serviceInput   = document.getElementById('service-input');
+
+  if (serviceTrigger && serviceMenu) {
+    serviceTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      serviceMenu.classList.toggle('open');
+      serviceTrigger.classList.toggle('open');
+    });
+
+    serviceMenu.querySelectorAll('.dropdown-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        const val = opt.dataset.value;
+        serviceInput.value = val;
+        serviceLabel.textContent = val;
+        serviceLabel.classList.remove('text-white/50');
+        serviceLabel.classList.add('text-white/90');
+        
+        serviceMenu.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        
+        serviceMenu.classList.remove('open');
+        serviceTrigger.classList.remove('open');
+      });
+    });
+
+    document.addEventListener('click', () => {
+      serviceMenu.classList.remove('open');
+      serviceTrigger.classList.remove('open');
+    });
+  }
 
 
   // ========== BACK TO TOP BUTTON ==========
@@ -500,4 +635,89 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+});
+
+
+// ==========================================
+// DYNAMIC TESTIMONIALS SYSTEM
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  const TM_STORAGE_KEY = 'PRABHA_TESTIMONIALS_DB';
+  const tmGrid = document.getElementById('testimonials-grid');
+  
+  if (!tmGrid) return;
+
+  // Save the original static HTML testimonials to fall back to if database is empty
+  const defaultHtml = tmGrid.innerHTML;
+
+  function updateTestimonials() {
+    const data = localStorage.getItem(TM_STORAGE_KEY);
+    if (!data) {
+      tmGrid.innerHTML = defaultHtml;
+      return;
+    }
+
+    const tms = JSON.parse(data);
+    if (tms.length === 0) {
+      tmGrid.innerHTML = defaultHtml;
+      return;
+    }
+
+    // We have custom testimonials! Replace the grid contents.
+    tmGrid.innerHTML = '';
+
+    const colors = [
+      { bg: 'bg-teal/10', text: 'text-teal' },
+      { bg: 'bg-gold/10', text: 'text-gold-dark' },
+      { bg: 'bg-green-500/10', text: 'text-green-600' },
+      { bg: 'bg-purple-500/10', text: 'text-purple-600' },
+      { bg: 'bg-blue-500/10', text: 'text-blue-600' }
+    ];
+
+    tms.forEach((t, i) => {
+      // Generate Initials (e.g. Ramya Krishnan -> RK)
+      const initials = t.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+      
+      // Pick a deterministic color based on index
+      const color = colors[i % colors.length];
+
+      // Generate Stars SVG
+      const starSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>`;
+      const dimStarSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0 opacity-35" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>`;
+      const starsHtml = starSvg.repeat(t.rating) + dimStarSvg.repeat(5 - t.rating);
+
+      const delay = (i * 0.1).toFixed(1);
+
+      const card = document.createElement('div');
+      card.className = `glass-card-light p-6 md:p-8 relative flex flex-col h-full`;
+      card.style.transitionDelay = `${delay}s`;
+      
+      card.innerHTML = `
+        <span class="absolute top-4 right-6 text-6xl text-teal/10 font-serif leading-none">&ldquo;</span>
+        <div class="flex gap-1 text-gold text-sm mb-4">
+          ${starsHtml}
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed mb-8 flex-grow">"${t.message}"</p>
+        <div class="flex items-center gap-4 mt-auto">
+          <div class="w-10 h-10 rounded-full ${color.bg} flex items-center justify-center ${color.text} font-bold text-sm">${initials}</div>
+          <div>
+            <p class="font-semibold text-dark text-sm">${t.name}</p>
+            <p class="text-gray-400 text-xs">${t.service}</p>
+          </div>
+        </div>
+      `;
+      
+      tmGrid.appendChild(card);
+    });
+  }
+
+  // Initial load
+  updateTestimonials();
+
+  // Listen for storage events (if admin dashboard changes the database in another tab)
+  window.addEventListener('storage', (e) => {
+    if (e.key === TM_STORAGE_KEY) {
+      updateTestimonials();
+    }
+  });
 });

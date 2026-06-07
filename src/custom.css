@@ -860,16 +860,8 @@ body {
 }
 
 /* ================================================================
-   MOBILE MENU
+   MOBILE MENU — slide-in drawer (styles in index.html inline)
    ================================================================ */
-.mobile-menu {
-  transform: translateX(100%);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.mobile-menu.active {
-  transform: translateX(0);
-}
 
 /* ================================================================
    STAR RATING
