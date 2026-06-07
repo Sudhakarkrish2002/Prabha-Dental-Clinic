@@ -1277,11 +1277,11 @@
       </div>
 
       <!-- Unified Contact Card Container -->
-      <div class="reveal bg-white/[0.03] border border-white/10 rounded-3xl backdrop-blur-xl overflow-hidden shadow-2xl">
-        <div class="grid xl:grid-cols-5">
+      <div class="reveal bg-white/[0.03] border border-white/10 rounded-3xl backdrop-blur-xl shadow-2xl">
+        <div class="grid grid-cols-1 lg:grid-cols-5">
           
           <!-- Contact Info Panel (Left Side, 2 Columns on Desktop) -->
-          <div class="lg:col-span-2 bg-gradient-to-br from-teal-dark/50 to-dark p-6 sm:p-10 lg:p-12 border-b lg:border-b-0 lg:border-r border-white/10 contact-info-panel contact-panel">
+          <div class="lg:col-span-2 bg-gradient-to-br from-teal-dark/50 to-dark p-6 sm:p-10 lg:p-12 border-b lg:border-b-0 lg:border-r border-white/10 rounded-t-3xl lg:rounded-tr-none lg:rounded-l-3xl contact-info-panel contact-panel">
             <h3 class="text-2xl font-heading font-bold text-white mb-8">Contact Information</h3>
             <div class="space-y-8">
               <div class="flex items-start gap-4 group">
@@ -1348,18 +1348,66 @@
                 <input type="email" id="email" name="email" placeholder="Your email" class="form-input" />
                 <label for="email" class="form-label">Email Address</label>
               </div>
-              <div class="form-group relative">
-                <select id="service-select" name="service" class="form-input cursor-pointer appearance-none text-white/90">
-                  <option value="" class="bg-dark" disabled selected hidden>Select Service</option>
-                  <option value="general" class="bg-dark text-white">General Dentistry</option>
-                  <option value="implants" class="bg-dark text-white">Dental Implants</option>
-                  <option value="rootcanal" class="bg-dark text-white">Root Canal</option>
-                  <option value="whitening" class="bg-dark text-white">Teeth Whitening</option>
-                  <option value="braces" class="bg-dark text-white">Braces & Orthodontics</option>
-                  <option value="pediatric" class="bg-dark text-white">Pediatric Dentistry</option>
-                </select>
-                <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                  <svg class="w-4 h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              <div class="form-group relative" id="cs-wrapper">
+                <input type="hidden" id="service-select" name="service" required>
+                <div class="custom-select-wrapper">
+                  <div class="custom-select-trigger" id="cs-trigger">
+                    <span class="cs-label">Service</span>
+                    <span class="cs-placeholder" id="cs-display">Select Service</span>
+                  </div>
+                  <div class="custom-select-arrow">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
+                  
+                  <div class="custom-select-dropdown" id="cs-dropdown">
+                    <div class="cs-option" data-value="general">
+                      <div class="cs-option-icon">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                      </div>
+                      <span class="cs-option-text">General Dentistry</span>
+                      <svg class="w-4 h-4 cs-option-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+
+                    <div class="cs-option" data-value="implants">
+                      <div class="cs-option-icon">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                      </div>
+                      <span class="cs-option-text">Dental Implants</span>
+                      <svg class="w-4 h-4 cs-option-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+
+                    <div class="cs-option" data-value="rootcanal">
+                      <div class="cs-option-icon">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                      </div>
+                      <span class="cs-option-text">Root Canal</span>
+                      <svg class="w-4 h-4 cs-option-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+
+                    <div class="cs-option" data-value="whitening">
+                      <div class="cs-option-icon">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                      </div>
+                      <span class="cs-option-text">Teeth Whitening</span>
+                      <svg class="w-4 h-4 cs-option-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+
+                    <div class="cs-option" data-value="braces">
+                      <div class="cs-option-icon">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                      </div>
+                      <span class="cs-option-text">Braces &amp; Orthodontics</span>
+                      <svg class="w-4 h-4 cs-option-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+
+                    <div class="cs-option" data-value="pediatric">
+                      <div class="cs-option-icon">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                      </div>
+                      <span class="cs-option-text">Pediatric Dentistry</span>
+                      <svg class="w-4 h-4 cs-option-check" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="form-group">
